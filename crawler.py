@@ -11,27 +11,42 @@ class Crawler():
         self.skill = skill
         self.old_ids = dota2_db.get_all_match_id(self.skill)
         self.buffer = []
-        with open("status.json") as f:
-            self.json_data = json.load(f)
-            self.succeed_in_last_run = self.json_data[str(skill)]
         self.total_download = 0
         self.total_valid = 0
         self.total_available = 0
+        self.download_succeed = True
+        self.reach_last = False
+        self.skip_num = 0
+
+    def get_history(self):
+        for _ in range(5):
+            try:
+                return api.get_match_history(skill=self.skill)["result"]
+            except:
+                pass
+        self.download_succeed = False
+        return None
 
     def download(self, from_=None):
         if not from_:
-            result = api.get_match_history(skill=self.skill)["result"]
+            result = self.get_history()
             self.total_available = int(result["total_results"])
             matches = result["matches"] if len(result) > 1 else []
         else:
-            result = api.get_match_history(skill=self.skill, start_at_match_id=from_)["result"]
+            result = self.get_history()
             matches = result["matches"][1:] if len(result) > 2 else []
         if not matches: return
 
         oldest_id = min([i["match_id"] for i in matches])
         for match in matches:
-            if int(match["match_id"]) in self.old_ids and self.succeed_in_last_run: return  # end if have the same
-            m = Match.get_match_by_id(match["match_id"])
+            if int(match["match_id"]) in self.old_ids:  # end if have the same
+                self.reach_last = True
+                continue
+            try:
+                m = Match.get_match_by_id(match["match_id"])
+            except:
+                self.skip_num += 1
+                continue
             print '.',
             self.total_download += 1
             if m.is_valid():
@@ -62,8 +77,11 @@ class Crawler():
             with open("log.txt", "a+") as f:
                 localtime = time.asctime(time.localtime(time.time()))
                 f.write(
-                    "Date: %s, Skill:%d, Total available: %d Total Download: %d, Total Valid: %d \tSucceed: %s\n" % (
+                    "Date: %s, Skill:%d, Total available: %d Total Download: %d, Total Valid: %d \t Reach Last: %s, "
+                    "Skip Num: %d \tSucceed: %s\n" % (
                         localtime, self.skill, self.total_available, self.total_download, self.total_valid,
-                        str(self.download_succeed) + "" if self.download_succeed else self.cause))
+                        str(self.reach_last), self.skip_num, str(self.download_succeed) + "" if self.download_succeed else self.cause))
             self.total_valid = 0
             self.total_download = 0
+            self.reach_last = False
+            self.skip_num = 0
