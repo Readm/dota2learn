@@ -6,7 +6,8 @@ class dota2_sql():
         user = config.getConfig("database", "dbuser")
         password = config.getConfig("database", "dbpassword")
         database = config.getConfig("database", "dbname")
-        self.conn = mysql.connector.connect(user=user, password=password, database=database, use_unicode=True)
+        host = config.getConfig("database", "dbhost")
+        self.conn = mysql.connector.connect(host=host,user=user, password=password, database=database, use_unicode=True)
         self.cursor = self.conn.cursor()
 
     def get_all_match_id(self, skill):
