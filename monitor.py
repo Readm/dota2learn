@@ -7,7 +7,7 @@ vh_crawler = crawler.Crawler(1)
 crawlers = [n_crawler, h_crawer, vh_crawler]
 interval = [config.getConfig("crawler", "n"), config.getConfig("crawler", "h"), config.getConfig("crawler", "vh")]
 
-last_run_time = [time.time()-interval[i]*60 for i in range(3)]
+last_run_time = [time.time()-int(interval[i])*60 for i in range(3)]
 while True:
     time_now = time.time()
     for i in range(3):
