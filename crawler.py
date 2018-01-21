@@ -56,7 +56,7 @@ class Crawler():
                 self.json_data[str(self.skill)] = self.download_succeed
                 json.dump(self.json_data, f, indent=4)
 
-            with open("log.txt", "w+") as f:
+            with open("log.txt", "a+") as f:
                 localtime = time.asctime(time.localtime(time.time()))
                 f.write("Date: %s, Skill:%d, Total Download: %d, Total Valid: %d Succeed %s\n" % (
                     localtime, self.skill, self.total_download, self.total_valid, str(self.download_succeed)))
