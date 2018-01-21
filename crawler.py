@@ -6,7 +6,7 @@ from match import Match
 dota2_db = sql.dota2_sql()
 
 
-class Crawier():
+class Crawler():
     def __init__(self, skill):
         self.skill = skill
         self.old_ids = dota2_db.get_all_match_id(self.skill)
@@ -30,10 +30,10 @@ class Crawier():
         for match in matches:
             if int(match["match_id"]) in self.old_ids and self.succeed_in_last_run: return  # end if have the same
             m = Match.get_match_by_id(match["match_id"])
-            print '.'
+            print '.',
             self.total_download += 1
             if m.is_valid():
-                print '|'
+                print '|',
                 self.total_valid += 1
                 self.buffer.append(m.sql_data)
                 self.old_ids.add(int(match["match_id"]))
@@ -58,11 +58,8 @@ class Crawier():
 
             with open("log.txt", "w+") as f:
                 localtime = time.asctime(time.localtime(time.time()))
-                f.write("Date: %s, Skill:%d, Total Download: %d, Total Valid: %d" % (
-                    localtime, self.skill, self.total_download, self.total_valid))
+                f.write("Date: %s, Skill:%d, Total Download: %d, Total Valid: %d Succeed %s\n" % (
+                    localtime, self.skill, self.total_download, self.total_valid, str(self.download_succeed)))
             self.total_valid = 0
             self.total_download = 0
 
-
-c = Crawier(2)
-c.run()
