@@ -70,6 +70,7 @@ class Crawler():
 
     def run(self):
         try:
+            self.old_ids = dota2_db.get_all_match_id(self.skill)
             self.download()
             self.download_succeed = True
         except Exception, e:
@@ -93,9 +94,9 @@ class Crawler():
             # update config automatically
             key = ["",'n','h','vh'][self.skill]
             current = int(getConfig("crawler", key))
-            if not self.reach_last and current > 3:
-                setConfig("crawler", key, int(current/1.5))
-            if self.same_id/float(self.total_valid+min([self.skip_num, 50]))>0.25:
-                setConfig("crawler", key, int(current*1.25))
+            if not self.reach_last and current > 60:
+                setConfig("crawler", key, int(current/1.2))
+            if self.same_id>10:
+                setConfig("crawler", key, int(current*1.05))
             self.same_id = 0
 
