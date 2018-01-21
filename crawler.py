@@ -16,10 +16,12 @@ class Crawler():
             self.succeed_in_last_run = self.json_data[str(skill)]
         self.total_download = 0
         self.total_valid = 0
+        self.total_available = 0
 
     def download(self, from_=None):
         if not from_:
             result = api.get_match_history(skill=self.skill)["result"]
+            self.total_available = int(result["total_results"])
             matches = result["matches"] if len(result) > 1 else []
         else:
             result = api.get_match_history(skill=self.skill, start_at_match_id=from_)["result"]
@@ -59,9 +61,9 @@ class Crawler():
 
             with open("log.txt", "a+") as f:
                 localtime = time.asctime(time.localtime(time.time()))
-                f.write("Date: %s, Skill:%d, Total Download: %d, Total Valid: %d Succeed: %s\n" % (
-                    localtime, self.skill, self.total_download, self.total_valid,
-                    str(self.download_succeed) + "" if self.download_succeed else self.cause))
+                f.write(
+                    "Date: %s, Skill:%d, Total available: %d Total Download: %d, Total Valid: %d \tSucceed: %s\n" % (
+                        localtime, self.skill, self.total_available, self.total_download, self.total_valid,
+                        str(self.download_succeed) + "" if self.download_succeed else self.cause))
             self.total_valid = 0
             self.total_download = 0
-
