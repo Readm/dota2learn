@@ -14,15 +14,18 @@ class Crawler():
         self.buffer = []
         self.total_download = 0
         self.total_valid = 0
-        self.total_available = 0
         self.download_succeed = True
         self.reach_last = False
         self.skip_num = 0
+        self.same_id = 0
 
-    def get_history(self):
+    def get_history(self, from_=None):
         for _ in range(5):
             try:
-                return api.get_match_history(skill=self.skill)["result"]
+                if from_:
+                    return api.get_match_history(skill=self.skill)["result"]
+                else:
+                    return api.get_match_history(skill=self.skill,start_at_match_id=from_)["result"]
             except:
                 pass
         self.download_succeed = False
@@ -31,16 +34,18 @@ class Crawler():
     def download(self, from_=None):
         if not from_:
             result = self.get_history()
-            self.total_available = int(result["total_results"])
+            if not result: return
             matches = result["matches"] if len(result) > 1 else []
         else:
-            result = self.get_history()
+            result = self.get_history(from_)
+            if not result: return
             matches = result["matches"][1:] if len(result) > 2 else []
         if not matches: return
 
         oldest_id = min([i["match_id"] for i in matches])
         for match in matches:
             if int(match["match_id"]) in self.old_ids:  # end if have the same
+                self.same_id +=1
                 self.reach_last = True
                 continue
             try:
@@ -76,9 +81,9 @@ class Crawler():
             with open("log.txt", "a+") as f:
                 localtime = time.asctime(time.localtime(time.time()))
                 f.write(
-                    "Date: %s, Skill:%d, Total available: %d Total Download: %d, Total Valid: %d \t Reach Last: %s, "
+                    "Date: %s, Skill:%d, Total Download: %d, Total Valid: %d \t Reach Last: %s, "
                     "Skip Num: %d \tSucceed: %s\n" % (
-                        localtime, self.skill, self.total_available, self.total_download, self.total_valid,
+                        localtime, self.skill, self.total_download, self.total_valid,
                         str(self.reach_last), self.skip_num, str(self.download_succeed) + "" if self.download_succeed else self.cause))
             self.total_valid = 0
             self.total_download = 0
@@ -86,11 +91,11 @@ class Crawler():
             self.skip_num = 0
 
             # update config automatically
-            key = ['n','h','vh'][self.skill]
+            key = ["",'n','h','vh'][self.skill]
             current = int(getConfig("crawler", key))
             if not self.reach_last and current > 3:
                 setConfig("crawler", key, int(current/1.5))
-            if self.reach_last and self.total_download < self.total_available*0.8:
+            if self.same_id/float(self.total_download+self.skip_num)>0.25:
                 setConfig("crawler", key, int(current*1.25))
-
+            self.same_id = 0
 
