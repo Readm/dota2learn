@@ -48,8 +48,9 @@ class Crawler():
         try:
             self.download()
             self.download_succeed = True
-        except:
+        except Exception, e:
             self.download_succeed = False
+            self.cause = str(e)
         finally:
             self.commit()
             with open("status.json", "w") as f:
@@ -58,8 +59,9 @@ class Crawler():
 
             with open("log.txt", "a+") as f:
                 localtime = time.asctime(time.localtime(time.time()))
-                f.write("Date: %s, Skill:%d, Total Download: %d, Total Valid: %d Succeed %s\n" % (
-                    localtime, self.skill, self.total_download, self.total_valid, str(self.download_succeed)))
+                f.write("Date: %s, Skill:%d, Total Download: %d, Total Valid: %d Succeed: %s\n" % (
+                    localtime, self.skill, self.total_download, self.total_valid,
+                    str(self.download_succeed) + "" if self.download_succeed else self.cause))
             self.total_valid = 0
             self.total_download = 0
 
