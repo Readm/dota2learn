@@ -73,8 +73,3 @@ class Match():
                 )
 
 
-import sql
-
-s = sql.dota2_sql()
-m = Match.get_match_by_id("3690951045")
-s.insert_many([m.sql_data], 1)

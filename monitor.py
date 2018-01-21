@@ -17,3 +17,4 @@ while True:
                 exit()
             last_run_time[i] = time_now
     time.sleep(30)
+    interval = [config.getConfig("crawler", "n"), config.getConfig("crawler", "h"), config.getConfig("crawler", "vh")]

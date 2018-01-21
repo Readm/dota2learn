@@ -2,6 +2,7 @@ import json, time
 from dota2py import api
 import sql
 from match import Match
+from config import setConfig, getConfig
 
 dota2_db = sql.dota2_sql()
 
@@ -70,9 +71,6 @@ class Crawler():
             self.cause = str(e)
         finally:
             self.commit()
-            with open("status.json", "w") as f:
-                self.json_data[str(self.skill)] = self.download_succeed
-                json.dump(self.json_data, f, indent=4)
 
             with open("log.txt", "a+") as f:
                 localtime = time.asctime(time.localtime(time.time()))
@@ -85,3 +83,13 @@ class Crawler():
             self.total_download = 0
             self.reach_last = False
             self.skip_num = 0
+
+            # update config automatically
+            key = ['n','h','vh'][self.skill]
+            current = int(getConfig("crawler", key))
+            if not self.reach_last and current > 3:
+                setConfig("crawler", key, int(current/1.5))
+            if self.reach_last and self.total_download < self.total_available*0.8:
+                setConfig("crawler", key, int(current*1.25))
+
+
