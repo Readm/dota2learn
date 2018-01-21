@@ -65,6 +65,9 @@ class Crawler():
             self.download(from_=oldest_id)
 
     def commit(self):
+        self.old_ids = dota2_db.get_all_match_id(self.skill)
+        for i in self.buffer:
+            if i[0] in self.old_ids: del i
         dota2_db.insert_many(self.buffer, self.skill)
         self.buffer = []
 
