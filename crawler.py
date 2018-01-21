@@ -30,8 +30,10 @@ class Crawier():
         for match in matches:
             if int(match["match_id"]) in self.old_ids and self.succeed_in_last_run: return  # end if have the same
             m = Match.get_match_by_id(match["match_id"])
+            print '.'
             self.total_download += 1
             if m.is_valid():
+                print '|'
                 self.total_valid += 1
                 self.buffer.append(m.sql_data)
                 self.old_ids.add(int(match["match_id"]))
