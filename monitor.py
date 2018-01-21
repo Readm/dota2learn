@@ -2,8 +2,8 @@ import time, os
 import config, crawler
 
 n_crawler = crawler.Crawler(1)
-h_crawer = crawler.Crawler(1)
-vh_crawler = crawler.Crawler(1)
+h_crawer = crawler.Crawler(2)
+vh_crawler = crawler.Crawler(3)
 crawlers = [n_crawler, h_crawer, vh_crawler]
 interval = [config.getConfig("crawler", "n"), config.getConfig("crawler", "h"), config.getConfig("crawler", "vh")]
 
