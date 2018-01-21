@@ -55,6 +55,7 @@ class Crawler():
                 self.total_valid += 1
                 self.buffer.append(m.sql_data)
                 self.old_ids.add(int(match["match_id"]))
+        self.commit()
         if int(result["results_remaining"]) > 0:
             self.download(from_=oldest_id)
 
