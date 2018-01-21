@@ -13,7 +13,7 @@ while True:
     for i in range(3):
         if time_now - last_run_time[i] > int(interval[i]) * 60:
             if os.fork()==0:
-                crawler[i].run()
+                crawlers[i].run()
                 exit()
             last_run_time[i] = time_now
     time.sleep(30)
