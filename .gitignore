@@ -5,6 +5,8 @@
 # IntelliJ project files
 .idea
 *.iml
-all.conf
+/all.conf
 out
 gen
+/test.py
+/log.txt
