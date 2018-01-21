@@ -95,7 +95,7 @@ class Crawler():
             current = int(getConfig("crawler", key))
             if not self.reach_last and current > 3:
                 setConfig("crawler", key, int(current/1.5))
-            if self.same_id/float(self.total_download+self.skip_num)>0.25:
+            if self.same_id/float(self.total_valid+min([self.skip_num, 50]))>0.25:
                 setConfig("crawler", key, int(current*1.25))
             self.same_id = 0
 
